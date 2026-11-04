@@ -1,0 +1,128 @@
+name: Build Minecraft Rust APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-apk.yml'
+      - 'README.md'
+      - 'docs/**'
+      - 'assets/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: minecraft-rust-android
+  cancel-in-progress: true
+
+jobs:
+  build-arm64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      CARGO_BUILD_JOBS: '2'
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      HORIZON_TELEMETRY_URL: 'off'
+    steps:
+      - name: Checkout Minecraft Rust project
+        uses: actions/checkout@v4
+
+      - name: Checkout Horizon Android engine source
+        uses: actions/checkout@v4
+        with:
+          repository: Vasysik/horizon-android
+          ref: android
+          path: upstream
+          persist-credentials: false
+
+      - name: Apply Minecraft Rust Android branding and rotation
+        working-directory: upstream
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('packaging/android/AndroidManifest.xml')
+          s = p.read_text()
+          s = s.replace('android:label="Horizon Android"', 'android:label="Minecraft Rust"')
+          s = s.replace('android:screenOrientation="sensorLandscape"', 'android:screenOrientation="user"')
+          p.write_text(s)
+          PY
+          grep -q 'android:label="Minecraft Rust"' packaging/android/AndroidManifest.xml
+          grep -q 'android:screenOrientation="user"' packaging/android/AndroidManifest.xml
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14'
+
+      - name: Install Android SDK and NDK
+        run: |
+          sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [[ ! -x "$sdkmanager" ]]; then
+            sdkmanager=$(find "$ANDROID_HOME/cmdline-tools" -type f -path '*/bin/sdkmanager' | sort -V | tail -n 1)
+          fi
+          "$sdkmanager" --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358'
+          rustup show
+          rustup target add aarch64-linux-android
+
+      - name: Create temporary APK signing key
+        working-directory: upstream
+        run: |
+          mkdir -p .local/android
+          keytool -genkeypair -noprompt -keystore .local/android/debug.keystore \
+            -storepass android -keypass android -alias androiddebugkey \
+            -dname "CN=Minecraft Rust, OU=Cometinha, O=Cometinha Studios, C=BR" \
+            -keyalg RSA -keysize 2048 -validity 10000
+
+      - name: Validate upstream Android source
+        working-directory: upstream
+        run: |
+          python3 tools/check_public_tree.py
+          python3 -m unittest discover -s tests -p 'test_android_release_audit.py'
+
+      - name: Prepare official Minecraft engine inputs
+        working-directory: upstream
+        run: python3 tools/android_prepare.py --java-home "$JAVA_HOME"
+
+      - name: Build optimized public ARM64 APK
+        working-directory: upstream
+        run: |
+          python3 tools/android_build.py --abi arm64-v8a --public --profile release \
+            --sdk "$ANDROID_HOME" --java-home "$JAVA_HOME" --gradle "$(command -v gradle)" \
+            --ndk-version 28.2.13676358 --build-tools-version 35.0.0
+
+      - name: Rename and verify APK
+        working-directory: upstream
+        run: |
+          mkdir -p dist
+          cp .local/android/apk/arm64-v8a/horizon-android-public.apk dist/Minecraft-Rust-arm64-v8a.apk
+          sha256sum dist/Minecraft-Rust-arm64-v8a.apk > dist/SHA256SUMS.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/Minecraft-Rust-arm64-v8a.apk | head -n 1
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          ## Minecraft Rust APK
+          ARM64 build generated from the upstream Horizon Android engine, with Minecraft Rust app branding and Android user-controlled orientation.
+          
+          **Important:** This initial CI build does not yet contain the redesigned launcher pages, FPS-unlimited implementation or Turnip ZIP driver manager. Those require source-level integration and testing.
+          EOF
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Minecraft-Rust-arm64
+          path: |
+            upstream/dist/Minecraft-Rust-arm64-v8a.apk
+            upstream/dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Remove temporary signing key
+        if: always()
+        working-directory: upstream
+        run: rm -f .local/android/debug.keystore
