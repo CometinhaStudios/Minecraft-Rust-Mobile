@@ -55,7 +55,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '25'
+          java-version: '21'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -87,24 +87,38 @@ jobs:
           python3 tools/check_public_tree.py
           python3 -m unittest discover -s tests -p 'test_android_release_audit.py'
 
-      - name: Accept Mojang's republished 26.3 metadata
+      - name: Accept verified Mojang 26.3 metadata republish
         working-directory: upstream
         run: |
           python3 - <<'PY'
-          import json
+          import hashlib, json, urllib.request
           from pathlib import Path
-          path = Path('research-lock.json')
-          lock = json.loads(path.read_text())
-          accepted = lock['minecraft']['accepted_manifest_sha1']
-          current = '80608ff6753705b6a82e2cb86a5937d4d233abd4'
-          if current not in accepted:
-              accepted.append(current)
-          path.write_text(json.dumps(lock, indent=2) + '\\n')
+          lock_path = Path('research-lock.json')
+          lock = json.loads(lock_path.read_text(encoding='utf-8'))
+          game = lock['minecraft']
+          catalog_url = 'https://piston-meta.mojang.com/mc/game/version_manifest_v2.json'
+          with urllib.request.urlopen(catalog_url, timeout=60) as response:
+              catalog = json.load(response)
+          entry = next(item for item in catalog['versions'] if item['id'] == game['version'])
+          with urllib.request.urlopen(entry['url'], timeout=60) as response:
+              raw = response.read()
+          manifest = json.loads(raw)
+          if manifest.get('id') != game['version']:
+              raise SystemExit('Mojang version metadata ID mismatch')
+          for side in ('client', 'server'):
+              if manifest.get('downloads', {}).get(side, {}).get('sha1') != game[f'{side}_sha1']:
+                  raise SystemExit(f'Mojang {side} artifact does not match the pinned Horizon engine')
+          checksum = hashlib.sha1(raw).hexdigest()
+          accepted = game.setdefault('accepted_manifest_sha1', [])
+          if checksum not in accepted and checksum != game.get('manifest_sha1'):
+              accepted.append(checksum)
+          lock_path.write_text(json.dumps(lock, indent=2) + '\\n', encoding='utf-8')
+          print(f'Validated Mojang {game["version"]} metadata: {checksum}')
           PY
 
       - name: Prepare official Minecraft engine inputs
         working-directory: upstream
-        run: python3 tools/android_prepare.py --java-home "$JAVA_HOME"
+        run: python3 tools/android_prepare.py
 
       - name: Build optimized public ARM64 APK
         working-directory: upstream
