@@ -70,7 +70,11 @@ jobs:
           fi
           "$sdkmanager" --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358'
           rustup show
-          rustup target add aarch64-linux-android
+          # Horizon pins Rust 1.95.0; install the Android stdlib for that exact
+          # toolchain (installing it only for stable does not affect Cargo's pinned toolchain).
+          rustup toolchain install 1.95.0 --profile minimal --target aarch64-linux-android
+          rustup target add --toolchain 1.95.0 aarch64-linux-android
+          rustup run 1.95.0 rustc --print target-libdir --target aarch64-linux-android
 
       - name: Create temporary APK signing key
         working-directory: upstream
