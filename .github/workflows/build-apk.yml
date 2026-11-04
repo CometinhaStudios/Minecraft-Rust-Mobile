@@ -112,7 +112,7 @@ jobs:
           accepted = game.setdefault('accepted_manifest_sha1', [])
           if checksum not in accepted and checksum != game.get('manifest_sha1'):
               accepted.append(checksum)
-          lock_path.write_text(json.dumps(lock, indent=2) + '\\n', encoding='utf-8')
+          lock_path.write_text(json.dumps(lock, indent=2), encoding='utf-8')
           print(f'Validated Mojang {game["version"]} metadata: {checksum}')
           PY
 
