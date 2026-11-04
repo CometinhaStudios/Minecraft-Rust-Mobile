@@ -8,6 +8,7 @@ on:
       - 'README.md'
       - 'docs/**'
       - 'assets/**'
+      - 'tools/apply_android_ui.py'
   workflow_dispatch:
 
 permissions:
@@ -36,6 +37,10 @@ jobs:
           ref: android
           path: upstream
           persist-credentials: false
+
+      - name: Apply Minecraft Rust Android UI and language integration
+        working-directory: upstream
+        run: python3 ../tools/apply_android_ui.py
 
       - name: Apply Minecraft Rust Android branding and rotation
         working-directory: upstream
@@ -142,7 +147,7 @@ jobs:
           ## Minecraft Rust APK
           ARM64 build generated from the upstream Horizon Android engine, with Minecraft Rust app branding and Android user-controlled orientation.
           
-          **Important:** This initial CI build does not yet contain the redesigned launcher pages, FPS-unlimited implementation or Turnip ZIP driver manager. Those require source-level integration and testing.
+          Android launcher source patch applied: persisted language preference with Automatic (Android system locale) and Português (Brasil), plus translated navigation labels and settings heading. FPS-unlimited frame pacing and Turnip ZIP driver management are not included in this build.
           EOF
 
       - name: Upload APK
