@@ -87,6 +87,21 @@ jobs:
           python3 tools/check_public_tree.py
           python3 -m unittest discover -s tests -p 'test_android_release_audit.py'
 
+      - name: Accept Mojang's republished 26.3 metadata
+        working-directory: upstream
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('research-lock.json')
+          lock = json.loads(path.read_text())
+          accepted = lock['minecraft']['accepted_manifest_sha1']
+          current = '80608ff6753705b6a82e2cb86a5937d4d233abd4'
+          if current not in accepted:
+              accepted.append(current)
+          path.write_text(json.dumps(lock, indent=2) + '\\n')
+          PY
+
       - name: Prepare official Minecraft engine inputs
         working-directory: upstream
         run: python3 tools/android_prepare.py --java-home "$JAVA_HOME"
