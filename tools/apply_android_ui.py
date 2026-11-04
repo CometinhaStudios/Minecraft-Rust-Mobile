@@ -56,8 +56,13 @@ replace(
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
+    "        let tabs = Page::ALL.len() as f32;",
+    "        let pt = self.catalog.config.language.portuguese();\n        let tabs = Page::ALL.len() as f32;"
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
     "        let compact = w < 700.0;",
-    "        let compact = w < 700.0;\n        let pt = self.catalog.config.language.portuguese();"
+    "        let compact = w < 700.0;"
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
