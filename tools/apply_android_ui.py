@@ -20,31 +20,20 @@ replace(
 #[serde(rename_all = "kebab-case")]
 pub enum UiLanguage {
     #[default]
-    Auto,
     PortugueseBrazil,
+    Spanish,
+    English,
 }
 impl UiLanguage {
     pub fn label(self) -> &'static str {
         match self {
-            Self::Auto => "Automático",
             Self::PortugueseBrazil => "Português (Brasil)",
+            Self::Spanish => "Español",
+            Self::English => "English",
         }
     }
-    pub fn portuguese(self) -> bool {
-        match self {
-            Self::PortugueseBrazil => true,
-            Self::Auto => {
-                let value = std::process::Command::new("/system/bin/getprop")
-                    .arg("persist.sys.locale")
-                    .output()
-                    .ok()
-                    .filter(|output| output.status.success())
-                    .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_ascii_lowercase())
-                    .unwrap_or_default();
-                value.starts_with("pt")
-            }
-        }
-    }
+    pub fn portuguese(self) -> bool { matches!(self, Self::PortugueseBrazil) }
+    pub fn spanish(self) -> bool { matches!(self, Self::Spanish) }
 }"""
 )
 
@@ -57,7 +46,7 @@ replace(
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
     "        let tabs = Page::ALL.len() as f32;",
-    "        let pt = self.catalog.config.language.portuguese();\n        let tabs = Page::ALL.len() as f32;"
+    "        let pt = self.catalog.config.language.portuguese();\n        let es = self.catalog.config.language.spanish();\n        let tabs = Page::ALL.len() as f32;"
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
@@ -67,11 +56,11 @@ replace(
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
     '                "Launch settings",',
-    '                if pt { "Configurações" } else { "Launch settings" },'
+    '                if pt { "Configurações" } else if es { "Configuración" } else { "Settings" },'
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
-    '                (\n                    "Server",',
+    '                (\n                    if pt { "Idioma" } else if es { "Idioma" } else { "Language" }, c.language.label().to_owned(), Action::Language,\n                ),\n                (\n                    if pt { "Servidor" } else if es { "Servidor" } else { "Server" },',
     '                (\n                    if pt { "Idioma" } else { "Language" }, c.language.label().to_owned(), Action::Language,\n                ),\n                (\n                    if pt { "Servidor" } else { "Server" },'
 )
 replace(
@@ -79,8 +68,9 @@ replace(
     "            Some(Action::ConfirmExit) => {",
     """            Some(Action::Language) => {
                 self.catalog.config.language = match self.catalog.config.language {
-                    crate::catalog::UiLanguage::Auto => crate::catalog::UiLanguage::PortugueseBrazil,
-                    crate::catalog::UiLanguage::PortugueseBrazil => crate::catalog::UiLanguage::Auto,
+                    crate::catalog::UiLanguage::PortugueseBrazil => crate::catalog::UiLanguage::Spanish,
+                    crate::catalog::UiLanguage::Spanish => crate::catalog::UiLanguage::English,
+                    crate::catalog::UiLanguage::English => crate::catalog::UiLanguage::PortugueseBrazil,
                 };
                 self.catalog.config.save(&self.home)?;
                 self.catalog.status = if self.catalog.config.language.portuguese() {
@@ -105,13 +95,15 @@ replace(
                 },""",
     """                if pt {
                     match page {
-                        Page::Play => "Jogar",
-                        Page::Mods => "Mods",
-                        Page::Packs => "Texturas",
-                        Page::Shaders => "Shaders",
-                        Page::Installed => "Arquivos",
-                        Page::Settings => "Config.",
-                        Page::Skins => "Aparência",
+                        Page::Play => "Jogar", Page::Mods => "Mods", Page::Packs => "Texturas",
+                        Page::Shaders => "Shaders", Page::Installed => "Arquivos",
+                        Page::Settings => "Config.", Page::Skins => "Aparência",
+                    }
+                } else if es {
+                    match page {
+                        Page::Play => "Jugar", Page::Mods => "Mods", Page::Packs => "Texturas",
+                        Page::Shaders => "Shaders", Page::Installed => "Archivos",
+                        Page::Settings => "Ajustes", Page::Skins => "Aspecto",
                     }
                 } else if w < 700.0 {
                     match page {
@@ -204,6 +196,8 @@ replace(
             for (i, page) in Page::ALL.iter().enumerate() {
                 let labels = if pt {
                     ["JOGAR", "MODS", "TEXTURAS", "SHADERS", "ARQUIVOS", "CONFIGURAÇÕES", "APARÊNCIA"]
+                } else if es {
+                    ["JUGAR", "MODS", "TEXTURAS", "SHADERS", "ARCHIVOS", "AJUSTES", "ASPECTO"]
                 } else {
                     ["PLAY", "MODS", "TEXTURES", "SHADERS", "FILES", "SETTINGS", "APPEARANCE"]
                 };
