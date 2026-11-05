@@ -720,3 +720,74 @@ replace(
     "        let note = ui.fit_text(Face::Regular, 12.0, &self.note, width - 64.0);\n        ui.text(Face::Regular, 12.0, content_x, ui.h - 60.0, color::MUTED, &note);"
 )
 print("Settings and appearance screens aligned with the launcher sidebar.");
+
+
+# Replace the temporary tap-to-cycle language control with an explicit language chooser.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "    Language,\n}",
+    "    Language,\n    ChooseLanguage(crate::catalog::UiLanguage),\n}"
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """            Some(Action::Language) => {
+                self.catalog.config.language = match self.catalog.config.language {
+                    crate::catalog::UiLanguage::PortugueseBrazil => crate::catalog::UiLanguage::Spanish,
+                    crate::catalog::UiLanguage::Spanish => crate::catalog::UiLanguage::English,
+                    crate::catalog::UiLanguage::English => crate::catalog::UiLanguage::PortugueseBrazil,
+                };
+                self.catalog.config.save(&self.home)?;
+                self.catalog.status = if self.catalog.config.language.portuguese() {
+                    "Idioma salvo: Português (Brasil).".into()
+                } else {
+                    "Language saved: Automatic (Android system language).".into()
+                };
+            }
+            Some(Action::ConfirmExit) => {""",
+    """            Some(Action::Language) => self.open_chooser(chooser::Kind::Language),
+            Some(Action::ChooseLanguage(language)) => {
+                self.catalog.config.language = language;
+                self.catalog.config.save(&self.home)?;
+                self.chooser = None;
+                self.catalog.status = match language {
+                    crate::catalog::UiLanguage::PortugueseBrazil => "Idioma salvo: Português (Brasil).".into(),
+                    crate::catalog::UiLanguage::Spanish => "Idioma guardado: Español.".into(),
+                    crate::catalog::UiLanguage::English => "Language saved: English.".into(),
+                };
+            }
+            Some(Action::ConfirmExit) => {"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "                                    | Action::InputHost\n",
+    "                                    | Action::InputHost\n                                    | Action::Language\n"
+)
+replace(
+    "crates/horizon-client/src/android/chooser.rs",
+    "    InputHost,\n}",
+    "    InputHost,\n    Language,\n}"
+)
+replace(
+    "crates/horizon-client/src/android/chooser.rs",
+    "        let (title, help, choices) = match kind {\n            Kind::Aspect => (",
+    """        let (title, help, choices) = match kind {
+            Kind::Language => (
+                if c.language.portuguese() { "Escolha o idioma" } else if c.language.spanish() { "Elige el idioma" } else { "Choose language" },
+                if c.language.portuguese() { "Selecione o idioma da interface." } else if c.language.spanish() { "Selecciona el idioma de la interfaz." } else { "Select the interface language." },
+                [
+                    ("Português (Brasil)", crate::catalog::UiLanguage::PortugueseBrazil),
+                    ("Español", crate::catalog::UiLanguage::Spanish),
+                    ("English", crate::catalog::UiLanguage::English),
+                ]
+                .into_iter()
+                .map(|(label, language)| (
+                    label.into(),
+                    String::new(),
+                    Action::ChooseLanguage(language),
+                    c.language == language,
+                ))
+                .collect(),
+            ),
+            Kind::Aspect => ("""
+)
+print("Added explicit persisted language chooser (Portuguese, Spanish, English).");
