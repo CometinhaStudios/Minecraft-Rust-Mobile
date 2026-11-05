@@ -364,3 +364,224 @@ replace(
     "self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll);",
     "let content_left = if ui.w >= 700.0 { 244.0 } else { 0.0 };\n            self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll, content_left);"
 )
+
+
+# Align every content screen with the wide-screen navigation rail.
+# Catalog: all controls, list rows, action buttons and hit targets use the content column.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """        } else if page.is_catalog() {
+            ui.text(
+                Face::Medium,
+                18.0,
+                32.0,
+                142.0,""",
+    """        } else if page.is_catalog() {
+            let cx = content_x;
+            let cw = content_w;
+            // Category mark: original geometric icon, drawn in the HUD (no Minecraft assets).
+            let mark = if page == Page::Mods { "M" } else if page == Page::Shaders { "✦" } else { "▦" };
+            ui.rounded(cx, 132.0, 38.0, 38.0, 8.0, color::ACCENT);
+            ui.text(Face::Medium, 22.0, cx + 9.0, 139.0, color::ON_ACCENT, mark);
+            ui.text(
+                Face::Medium,
+                18.0,
+                cx + 50.0,
+                142.0,"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                [32.0, 174.0, w - 240.0, 44.0],""",
+    """                [cx, 174.0, (cw - 170.0).max(100.0), 44.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                [w - 190.0, 174.0, 158.0, 44.0],""",
+    """                [cx + cw - 158.0, 174.0, 158.0, 44.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                let width = ((w - 185.0) / 2.0).clamp(58.0, 120.0);""",
+    """                let width = ((cw - 185.0) / 2.0).clamp(58.0, 120.0);"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                    let rect = [w - 32.0 - (2 - i) as f32 * width, 134.0, width - 5.0, 32.0];""",
+    """                    let rect = [cx + cw - 10.0 - (2 - i) as f32 * width, 134.0, width - 5.0, 32.0];"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """            let hint = ui.fit_text(Face::Regular, 14.0, hint, w - 64.0);
+            ui.text(Face::Regular, 14.0, 32.0, 270.0, color::MUTED, &hint);""",
+    """            let hint = ui.fit_text(Face::Regular, 14.0, hint, cw - 64.0);
+            ui.text(Face::Regular, 14.0, cx, 270.0, color::MUTED, &hint);"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """            let file_button_width = ((w - 72.0) / 2.0).min(158.0);""",
+    """            let file_button_width = ((cw - 72.0) / 2.0).min(158.0);"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                [32.0, 222.0, file_button_width, 38.0],""",
+    """                [cx, 222.0, file_button_width, 38.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                [w - 32.0 - file_button_width, 222.0, file_button_width, 38.0],""",
+    """                [cx + cw - file_button_width, 222.0, file_button_width, 38.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """            let top = 296.0;""",
+    """            let top = 296.0;"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                let title = ui.fit_text(Face::Medium, 19.0, title, w - 214.0);
+                let summary = ui.fit_text(Face::Regular, 14.0, description, w - 214.0);
+                ui.text(Face::Medium, 19.0, 32.0, y, color::TEXT, &title);
+                ui.text(Face::Regular, 14.0, 32.0, y + 29.0, color::MUTED, &summary);""",
+    """                let title = ui.fit_text(Face::Medium, 19.0, title, cw - 214.0);
+                let summary = ui.fit_text(Face::Regular, 14.0, description, cw - 214.0);
+                ui.text(Face::Medium, 19.0, cx, y, color::TEXT, &title);
+                ui.text(Face::Regular, 14.0, cx, y + 29.0, color::MUTED, &summary);"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                    [w - 150.0, y, 118.0, 42.0],""",
+    """                    [cx + cw - 118.0, y, 118.0, 42.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        .push(([w - 150.0, y, 118.0, 70.0], Action::Install(i)));""",
+    """                        .push(([cx + cw - 118.0, y, 118.0, 70.0], Action::Install(i)));"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                let title = ui.fit_text(Face::Medium, 19.0, &p.title, w - 214.0);
+                let summary = ui.fit_text(Face::Regular, 14.0, &p.summary, w - 214.0);
+                ui.text(Face::Medium, 19.0, 32.0, y, color::TEXT, &title);
+                ui.text(Face::Regular, 14.0, 32.0, y + 29.0, color::MUTED, &summary);""",
+    """                let title = ui.fit_text(Face::Medium, 19.0, &p.title, cw - 214.0);
+                let summary = ui.fit_text(Face::Regular, 14.0, &p.summary, cw - 214.0);
+                ui.text(Face::Medium, 19.0, cx, y, color::TEXT, &title);
+                ui.text(Face::Regular, 14.0, cx, y + 29.0, color::MUTED, &summary);"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        w - 150.0,
+                        y + 12.0,""",
+    """                        cx + cw - 118.0,
+                        y + 12.0,"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        w - 150.0,
+                        y + 12.0,""",
+    """                        cx + cw - 118.0,
+                        y + 12.0,"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        w - 150.0,
+                        y + 12.0,""",
+    """                        cx + cw - 118.0,
+                        y + 12.0,"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        [w - 150.0, y, 118.0, 42.0],""",
+    """                        [cx + cw - 118.0, y, 118.0, 42.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                [32.0, h - 100.0, 120.0, 40.0],""",
+    """                [cx, h - 100.0, 120.0, 40.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                [166.0, h - 100.0, 120.0, 40.0],""",
+    """                [cx + 134.0, h - 100.0, 120.0, 40.0],"""
+)
+# Installed content: shift section headers, imports, item names, toggles and delete buttons.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """        } else if page == Page::Installed {
+            use horizon_client::content_files::Kind;""",
+    """        } else if page == Page::Installed {
+            use horizon_client::content_files::Kind;
+            let cx = content_x;
+            let cw = content_w;"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """            self.list_targets
+                    .push(([32.0, y, w - 210.0, 40.0], Action::ToggleSection(section)));
+                self.list_targets
+                    .push(([w - 165.0, y, 133.0, 40.0], Action::Import(kind)));""",
+    """            self.list_targets
+                    .push(([cx, y, (cw - 145.0).max(100.0), 40.0], Action::ToggleSection(section)));
+                self.list_targets
+                    .push(([cx + cw - 133.0, y, 133.0, 40.0], Action::Import(kind)));"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        [32.0, y, w - 210.0, 40.0],""",
+    """                        [cx, y, (cw - 145.0).max(100.0), 40.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        [w - 165.0, y, 133.0, 40.0],""",
+    """                        [cx + cw - 133.0, y, 133.0, 40.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                            if compact { 32.0 } else { w - 300.0 },""",
+    """                            if compact { 32.0 } else { cx + cw - 268.0 },"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                            120.0,
+                            row_height - 4.0,""",
+    """                            120.0,
+                            row_height - 4.0,"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        [w - 165.0, y, 133.0, row_height - 4.0],""",
+    """                        [cx + cw - 133.0, y, 133.0, row_height - 4.0],"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        if compact { w - 364.0 } else { w - 364.0 },""",
+    """                        if compact { cw - 64.0 } else { cw - 364.0 },"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                    ui.text(Face::Medium, 19.0, 32.0, y, color::TEXT, &title);""",
+    """                    ui.text(Face::Medium, 19.0, cx, y, color::TEXT, &title);"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        32.0,
+                        y + 28.0,""",
+    """                        cx,
+                        y + 28.0,"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                            if compact { 32.0 } else { w - 300.0 },""",
+    """                            if compact { 32.0 } else { cx + cw - 268.0 },"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                                if compact { 32.0 } else { w - 300.0 },""",
+    """                                if compact { 32.0 } else { cx + cw - 268.0 },"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        [w - 165.0, y + if compact { 55.0 } else { 0.0 }, 133.0, 40.0],""",
+    """                        [cx + cw - 133.0, y + if compact { 55.0 } else { 0.0 }, 133.0, 40.0],"""
+)
+print("All catalog and installed pages now use the content column; category icons added.");
