@@ -330,3 +330,34 @@ replace(
             ui.rounded(content_x - 12.0, 142.0, content_w + 24.0, h - 162.0, 16.0, color::RAISED);
             ui.rounded(content_x - 12.0, 142.0, 5.0, h - 162.0, 2.0, color::ACCENT);"""
 )
+
+
+# The wardrobe page is a two-column layout. Offset BOTH columns into the content
+# area so the preview and its controls never sit underneath the navigation rail.
+replace(
+    "crates/horizon-client/src/android/launcher.rs",
+    "self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll);",
+    "self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll, if ui.w >= 700.0 { 244.0 } else { 0.0 });"
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    "pub fn draw(&mut self, ui: &mut Ui, targets: &mut Vec<([f32; 4], Action)>, scroll: f32) {\n        let width = ui.w;\n        let compact = width < 700.0;",
+    "pub fn draw(&mut self, ui: &mut Ui, targets: &mut Vec<([f32; 4], Action)>, scroll: f32, content_left: f32) {\n        let width = ui.w - content_left;\n        let compact = ui.w < 700.0;"
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    "        let px = if compact {\n            (width - preview_width) * 0.5\n        } else {\n            32.0\n        };",
+    "        let px = if compact {\n            (width - preview_width) * 0.5\n        } else {\n            content_left + 32.0\n        };"
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    "        let lx = if compact { 32.0 } else { 370.0 };",
+    "        let lx = if compact { 32.0 } else { content_left + 370.0 };"
+)
+# Give the new wide layout a real content-column title/header, and avoid legacy label overlap.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    '            &format!("MINECRAFT RUST  •  {}", crate::backend::VERSION),',
+    '            &format!("MINECRAFT RUST  •  {}", crate::backend::VERSION),'
+)
+print("Wardrobe columns aligned after the sidebar.");
