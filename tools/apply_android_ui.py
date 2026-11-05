@@ -123,6 +123,37 @@ replace(
                     page.name()
                 },"""
 )
+
+# Translate every settings row label and the common setting values.
+for old, new in [
+    ('"Rendering"', 'if pt { "Renderização" } else if es { "Renderizado" } else { "Rendering" }'),
+    ('"Client resolution"', 'if pt { "Resolução do cliente" } else if es { "Resolución del cliente" } else { "Client resolution" }'),
+    ('"Chunk worker limit"', 'if pt { "Limite de tarefas de chunks" } else if es { "Límite de tareas de chunks" } else { "Chunk worker limit" }'),
+    ('"Reusable RAM cache"', 'if pt { "Cache de RAM reutilizável" } else if es { "Caché de RAM reutilizable" } else { "Reusable RAM cache" }'),
+    ('"Game files"', 'if pt { "Arquivos do jogo" } else if es { "Archivos del juego" } else { "Game files" }'),
+    ('"World files"', 'if pt { "Arquivos dos mundos" } else if es { "Archivos de mundos" } else { "World files" }'),
+    ('"Profile"', 'if pt { "Perfil" } else if es { "Perfil" } else { "Profile" }'),
+    ('"Orientation"', 'if pt { "Orientação" } else if es { "Orientación" } else { "Orientation" }'),
+    ('"Input"', 'if pt { "Entrada" } else if es { "Entrada" } else { "Input" }'),
+    ('"Immersive fullscreen"', 'if pt { "Tela cheia imersiva" } else if es { "Pantalla completa inmersiva" } else { "Immersive fullscreen" }'),
+    ('"Avoid camera cutout"', 'if pt { "Evitar recorte da câmera" } else if es { "Evitar recorte de cámara" } else { "Avoid camera cutout" }'),
+    ('"Aspect ratio"', 'if pt { "Proporção da tela" } else if es { "Relación de aspecto" } else { "Aspect ratio" }'),
+    ('"Display refresh rate"', 'if pt { "Taxa de atualização da tela" } else if es { "Frecuencia de actualización" } else { "Display refresh rate" }'),
+    ('"Performance hints"', 'if pt { "Otimizações de desempenho" } else if es { "Ajustes de rendimiento" } else { "Performance hints" }'),
+    ('"GPU profiling"', 'if pt { "Monitoramento da GPU" } else if es { "Perfilado de GPU" } else { "GPU profiling" }'),
+    ('"Performance recording"', 'if pt { "Gravação de desempenho" } else if es { "Registro de rendimiento" } else { "Performance recording" }'),
+    ('"Diagnostic report"', 'if pt { "Relatório de diagnóstico" } else if es { "Informe de diagnóstico" } else { "Diagnostic report" }'),
+    ('"Raw performance data"', 'if pt { "Dados brutos de desempenho" } else if es { "Datos sin procesar de rendimiento" } else { "Raw performance data" }'),
+    ('"Server"', 'if pt { "Servidor" } else if es { "Servidor" } else { "Server" }'),
+    ('"No additional limit"', 'if pt { "Sem limite adicional" } else if es { "Sin límite adicional" } else { "No additional limit" }'),
+    ('"Engine default (80 MiB)"', 'if pt { "Padrão do mecanismo (80 MiB)" } else if es { "Predeterminado (80 MiB)" } else { "Engine default (80 MiB)" }'),
+    ('"Open in system Files"', 'if pt { "Abrir no gerenciador de arquivos" } else if es { "Abrir en Archivos del sistema" } else { "Open in system Files" }'),
+    ('"Import / copy / back up in Files"', 'if pt { "Importar / copiar / fazer backup" } else if es { "Importar / copiar / respaldar" } else { "Import / copy / back up in Files" }'),
+    ('"Microsoft / Xbox account"', 'if pt { "Conta Microsoft / Xbox" } else if es { "Cuenta Microsoft / Xbox" } else { "Microsoft / Xbox account" }'),
+    ('"Diagnostics"', 'if pt { "Diagnósticos" } else if es { "Diagnósticos" } else { "Diagnostics" }'),
+]:
+    replace("crates/horizon-client/src/android/launcher_pages.rs", old, new)
+
 print("Android launcher language integration applied.")
 
 
