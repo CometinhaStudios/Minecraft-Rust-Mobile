@@ -513,7 +513,7 @@ replace(
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
     """                            if compact { 32.0 } else { w - 300.0 },""",
-    """                            if compact { 32.0 } else { cx + cw - 268.0 }""",
+    """                            if compact { 32.0 } else { cx + cw - 268.0 },""",
     count=3
 )
 replace(
