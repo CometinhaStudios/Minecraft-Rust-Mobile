@@ -530,11 +530,6 @@ replace(
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
-    """                        if compact { w - 364.0 } else { w - 364.0 },""",
-    """                        if compact { cw - 64.0 } else { cw - 364.0 },"""
-)
-replace(
-    "crates/horizon-client/src/android/launcher_pages.rs",
     """                    ui.text(Face::Medium, 19.0, 32.0, y, color::TEXT, &title);""",
     """                    ui.text(Face::Medium, 19.0, cx, y, color::TEXT, &title);"""
 )
