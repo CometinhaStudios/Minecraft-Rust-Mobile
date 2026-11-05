@@ -657,3 +657,65 @@ replace(
     """                        [cx + cw - 133.0, y + if compact { 55.0 } else { 0.0 }, 133.0, 40.0],"""
 )
 print("All catalog and installed pages now use the content column; category icons added.");
+
+
+# Fix the two screens that were still drawing in the full-window coordinate space.
+# Settings must use the same content column as the sidebar-aware catalog pages.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "            let c = &self.catalog.config;\n            ui.text(",
+    "            let c = &self.catalog.config;\n            let cx = content_x;\n            let cw = content_w;\n            ui.text("
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "                24.0,\n                32.0,\n                156.0,",
+    "                24.0,\n                cx,\n                156.0,"
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "                        if compact { 32.0 } else { w * 0.36 },\n                        y,\n                        if compact { w - 64.0 } else { w * 0.64 - 32.0 },",
+    "                        if compact { 32.0 } else { cx + cw * 0.36 },\n                        y,\n                        if compact { w - 64.0 } else { cw * 0.64 - 32.0 },"
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "                    32.0,\n                    y + if compact { 0.0 } else { 13.0 },",
+    "                    if compact { 32.0 } else { cx },\n                    y + if compact { 0.0 } else { 13.0 },"
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "                            if compact { 32.0 } else { w * 0.36 },\n                            y + if compact { 24.0 } else { 0.0 },\n                            if compact { w - 64.0 } else { w * 0.64 - 32.0 },",
+    "                            if compact { 32.0 } else { cx + cw * 0.36 },\n                            y + if compact { 24.0 } else { 0.0 },\n                            if compact { w - 64.0 } else { cw * 0.64 - 32.0 },"
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "                    32.0,\n                    y + if compact { 78.0 } else { 62.0 },\n                    w - 64.0,",
+    "                    if compact { 32.0 } else { cx },\n                    y + if compact { 78.0 } else { 62.0 },\n                    if compact { w - 64.0 } else { cw - 64.0 },"
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "                [w * 0.5 + 6.0, h - 114.0, w * 0.5 - 38.0, 42.0],",
+    "                [if compact { w * 0.5 + 6.0 } else { cx + cw * 0.5 + 6.0 }, h - 114.0, if compact { w * 0.5 - 38.0 } else { cw * 0.5 - 38.0 }, 42.0],"
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "                [32.0, h - 114.0, w * 0.5 - 38.0, 42.0],",
+    "                [if compact { 32.0 } else { cx }, h - 114.0, if compact { w * 0.5 - 38.0 } else { cw * 0.5 - 38.0 }, 42.0],"
+)
+
+# The large appearance heading and its helper text also belong to the content column.
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '        ui.text(Face::Medium, 26.0, 32.0, top, color::TEXT, if pt { "Visuais e capas" } else if es { "Aspectos y capas" } else { "Skins & Capes" });',
+    '        let content_x = if compact { 32.0 } else { content_left + 32.0 };\n        ui.text(Face::Medium, 26.0, content_x, top, color::TEXT, if pt { "Visuais e capas" } else if es { "Aspectos y capas" } else { "Skins & Capes" });'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    "            32.0,\n            top + 36.0,",
+    "            content_x,\n            top + 36.0,"
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    "        let note = ui.fit_text(Face::Regular, 12.0, &self.note, width - 64.0);\n        ui.text(Face::Regular, 12.0, 32.0, ui.h - 60.0, color::MUTED, &note);",
+    "        let note = ui.fit_text(Face::Regular, 12.0, &self.note, width - 64.0);\n        ui.text(Face::Regular, 12.0, content_x, ui.h - 60.0, color::MUTED, &note);"
+)
+print("Settings and appearance screens aligned with the launcher sidebar.");
