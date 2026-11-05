@@ -256,7 +256,7 @@ replace(
     """            let top = 160.0;
             ui.text(
                 Face::Medium,
-                32.0,
+                if compact { 28.0 } else { 36.0 },
                 32.0,
                 top,
                 color::TEXT,
