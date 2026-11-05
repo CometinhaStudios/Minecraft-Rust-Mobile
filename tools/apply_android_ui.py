@@ -341,7 +341,7 @@ replace(
 replace(
     "crates/horizon-client/src/android/wardrobe.rs",
     "pub fn draw(&mut self, ui: &mut Ui, targets: &mut Vec<([f32; 4], Action)>, scroll: f32) {\n        let width = ui.w;\n        let compact = width < 700.0;",
-    "pub fn draw(&mut self, ui: &mut Ui, targets: &mut Vec<([f32; 4], Action)>, scroll: f32, content_left: f32) {\n        let width = ui.w - content_left;\n        let compact = ui.w < 700.0;"
+    "pub fn draw(&mut self, ui: &mut Ui, targets: &mut Vec<([f32; 4], Action)>, scroll: f32, content_left: f32, language: crate::catalog::UiLanguage) {\n        let width = ui.w - content_left;\n        let compact = ui.w < 700.0;\n        let pt = language.portuguese();\n        let es = language.spanish();"
 )
 replace(
     "crates/horizon-client/src/android/wardrobe.rs",
@@ -361,12 +361,80 @@ replace(
 )
 print("Wardrobe columns aligned after the sidebar.");
 
+# Translate the visible appearance editor controls in all three languages.
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Skins & Capes"',
+    'if pt { "Visuais e capas" } else if es { "Aspectos y capas" } else { "Skins & Capes" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Local choices change your view. Cloud buttons update your account."',
+    'if pt { "As escolhas locais mudam sua aparência. Ações na nuvem alteram sua conta." } else if es { "Las opciones locales cambian tu aspecto. Las acciones en la nube actualizan tu cuenta." } else { "Local choices change your view. Cloud buttons update your account." }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Alex / Slim"',
+    'if pt { "Alex / Fino" } else if es { "Alex / Delgado" } else { "Alex / Slim" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Steve / Classic"',
+    'if pt { "Steve / Clássico" } else if es { "Steve / Clásico" } else { "Steve / Classic" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Skins"',
+    'if pt { "Visuais" } else if es { "Aspectos" } else { "Skins" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Capes"',
+    'if pt { "Capas" } else if es { "Capas" } else { "Capes" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Import PNG to local gallery"',
+    'if pt { "Importar PNG para a galeria" } else if es { "Importar PNG a la galería" } else { "Import PNG to local gallery" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Reset to default locally"',
+    'if pt { "Restaurar padrão local" } else if es { "Restablecer apariencia local" } else { "Reset to default locally" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Use current cloud appearance"',
+    'if pt { "Usar aparência atual da nuvem" } else if es { "Usar aspecto actual de la nube" } else { "Use current cloud appearance" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Refresh cloud profile"',
+    'if pt { "Atualizar perfil da nuvem" } else if es { "Actualizar perfil de la nube" } else { "Refresh cloud profile" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Upload selected skin to Microsoft"',
+    'if pt { "Enviar visual para a Microsoft" } else if es { "Subir aspecto a Microsoft" } else { "Upload selected skin to Microsoft" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Manage Ely.by cloud skin on website"',
+    'if pt { "Gerenciar visual Ely.by no site" } else if es { "Gestionar aspecto Ely.by en el sitio" } else { "Manage Ely.by cloud skin on website" }'
+)
+replace(
+    "crates/horizon-client/src/android/wardrobe.rs",
+    '"Hide / show cape locally"',
+    'if pt { "Ocultar / mostrar capa" } else if es { "Ocultar / mostrar capa" } else { "Hide / show cape locally" }'
+)
+
+
 
 # Correct file: draw_pages and the wardrobe dispatch live in launcher_pages.rs.
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
     "self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll);",
-    "let content_left = if ui.w >= 700.0 { 244.0 } else { 0.0 };\n            self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll, content_left);"
+    "let content_left = if ui.w >= 700.0 { 244.0 } else { 0.0 };\n            self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll, content_left, self.catalog.config.language);"
 )
 
 
