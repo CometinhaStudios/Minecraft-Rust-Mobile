@@ -95,15 +95,23 @@ replace(
                 },""",
     """                if pt {
                     match page {
-                        Page::Play => "Jogar", Page::Mods => "Mods", Page::Packs => "Texturas",
-                        Page::Shaders => "Shaders", Page::Installed => "Arquivos",
-                        Page::Settings => "Config.", Page::Skins => "Aparência",
+                        Page::Play => "Jogar",
+                        Page::Mods => "Mods",
+                        Page::Packs => "Texturas",
+                        Page::Shaders => "Shaders",
+                        Page::Installed => "Arquivos",
+                        Page::Settings => "Config.",
+                        Page::Skins => "Aparência",
                     }
                 } else if es {
                     match page {
-                        Page::Play => "Jugar", Page::Mods => "Mods", Page::Packs => "Texturas",
-                        Page::Shaders => "Shaders", Page::Installed => "Archivos",
-                        Page::Settings => "Ajustes", Page::Skins => "Aspecto",
+                        Page::Play => "Jugar",
+                        Page::Mods => "Mods",
+                        Page::Packs => "Texturas",
+                        Page::Shaders => "Shaders",
+                        Page::Installed => "Archivos",
+                        Page::Settings => "Ajustes",
+                        Page::Skins => "Aspecto",
                     }
                 } else if w < 700.0 {
                     match page {
