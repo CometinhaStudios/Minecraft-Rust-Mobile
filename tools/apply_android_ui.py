@@ -682,11 +682,6 @@ replace(
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
-    "                            if compact { 32.0 } else { w * 0.36 },\n                            y + if compact { 24.0 } else { 0.0 },\n                            if compact { w - 64.0 } else { w * 0.64 - 32.0 },",
-    "                            if compact { 32.0 } else { cx + cw * 0.36 },\n                            y + if compact { 24.0 } else { 0.0 },\n                            if compact { w - 64.0 } else { cw * 0.64 - 32.0 },"
-)
-replace(
-    "crates/horizon-client/src/android/launcher_pages.rs",
     "                    32.0,\n                    y + if compact { 78.0 } else { 62.0 },\n                    w - 64.0,",
     "                    if compact { 32.0 } else { cx },\n                    y + if compact { 78.0 } else { 62.0 },\n                    if compact { w - 64.0 } else { cw - 64.0 },"
 )
