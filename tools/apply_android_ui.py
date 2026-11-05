@@ -335,11 +335,6 @@ replace(
 # The wardrobe page is a two-column layout. Offset BOTH columns into the content
 # area so the preview and its controls never sit underneath the navigation rail.
 replace(
-    "crates/horizon-client/src/android/launcher.rs",
-    "self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll);",
-    "let content_left = if ui.w >= 700.0 { 244.0 } else { 0.0 };\n            self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll, content_left);"
-)
-replace(
     "crates/horizon-client/src/android/wardrobe.rs",
     "pub fn draw(&mut self, ui: &mut Ui, targets: &mut Vec<([f32; 4], Action)>, scroll: f32) {\n        let width = ui.w;\n        let compact = width < 700.0;",
     "pub fn draw(&mut self, ui: &mut Ui, targets: &mut Vec<([f32; 4], Action)>, scroll: f32, content_left: f32) {\n        let width = ui.w - content_left;\n        let compact = ui.w < 700.0;"
