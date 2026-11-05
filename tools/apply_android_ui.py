@@ -60,8 +60,8 @@ replace(
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
-    '                (\n                    if pt { "Idioma" } else if es { "Idioma" } else { "Language" }, c.language.label().to_owned(), Action::Language,\n                ),\n                (\n                    if pt { "Servidor" } else if es { "Servidor" } else { "Server" },',
-    '                (\n                    if pt { "Idioma" } else { "Language" }, c.language.label().to_owned(), Action::Language,\n                ),\n                (\n                    if pt { "Servidor" } else { "Server" },'
+    '                (\n                    "Server",',
+    '                (\n                    if pt { "Idioma" } else if es { "Idioma" } else { "Language" }, c.language.label().to_owned(), Action::Language,\n                ),\n                (\n                    if pt { "Servidor" } else if es { "Servidor" } else { "Server" },'
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
