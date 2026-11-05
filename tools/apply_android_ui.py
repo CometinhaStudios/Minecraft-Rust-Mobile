@@ -361,3 +361,11 @@ replace(
     '            &format!("MINECRAFT RUST  •  {}", crate::backend::VERSION),'
 )
 print("Wardrobe columns aligned after the sidebar.");
+
+
+# Correct file: draw_pages and the wardrobe dispatch live in launcher_pages.rs.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    "self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll);",
+    "let content_left = if ui.w >= 700.0 { 244.0 } else { 0.0 };\n            self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll, content_left);"
+)
