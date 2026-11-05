@@ -162,3 +162,159 @@ replace(
                 color::TEXT,''',
 )
 print("Minecraft Rust launcher visual surfaces applied.")
+
+
+# Replace the old horizontal tab strip with a real launcher sidebar on wide screens.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """        for (i, page) in Page::ALL.iter().enumerate() {
+            let x = tab_margin + i as f32 * tab_width;
+            button(
+                &mut ui,
+                &mut self.targets,
+                [x, 88.0, tab_width - 4.0, 42.0],
+                if pt {
+                    match page {
+                        Page::Play => "Jogar",
+                        Page::Mods => "Mods",
+                        Page::Packs => "Texturas",
+                        Page::Shaders => "Shaders",
+                        Page::Installed => "Arquivos",
+                        Page::Settings => "Config.",
+                        Page::Skins => "Aparência",
+                    }
+                } else if w < 700.0 {
+                    match page {
+                        Page::Installed => "Files",
+                        Page::Settings => "Setup",
+                        _ => page.name(),
+                    }
+                } else {
+                    page.name()
+                },
+                Action::Page(*page),
+                *page == self.catalog.page,
+            );
+        }
+        let compact = w < 700.0;""",
+    """        if w >= 700.0 {
+            // Wide launcher: persistent left navigation instead of the legacy tab strip.
+            ui.rounded(16.0, 88.0, 196.0, h - 104.0, 14.0, color::RAISED);
+            ui.text(Face::Medium, 13.0, 38.0, 108.0, color::MUTED, "MINECRAFT RUST");
+            for (i, page) in Page::ALL.iter().enumerate() {
+                let labels = if pt {
+                    ["JOGAR", "MODS", "TEXTURAS", "SHADERS", "ARQUIVOS", "CONFIGURAÇÕES", "APARÊNCIA"]
+                } else {
+                    ["PLAY", "MODS", "TEXTURES", "SHADERS", "FILES", "SETTINGS", "APPEARANCE"]
+                };
+                let y = 140.0 + i as f32 * 54.0;
+                button(
+                    &mut ui,
+                    &mut self.targets,
+                    [30.0, y, 164.0, 44.0],
+                    labels[i],
+                    Action::Page(*page),
+                    *page == self.catalog.page,
+                );
+            }
+        } else {
+            for (i, page) in Page::ALL.iter().enumerate() {
+                let x = tab_margin + i as f32 * tab_width;
+                button(
+                    &mut ui,
+                    &mut self.targets,
+                    [x, 88.0, tab_width - 4.0, 42.0],
+                    if pt {
+                        match page {
+                            Page::Play => "Jogar",
+                            Page::Mods => "Mods",
+                            Page::Packs => "Texturas",
+                            Page::Shaders => "Shaders",
+                            Page::Installed => "Arquivos",
+                            Page::Settings => "Config.",
+                            Page::Skins => "Aparência",
+                        }
+                    } else {
+                        match page {
+                            Page::Installed => "Files",
+                            Page::Settings => "Setup",
+                            _ => page.name(),
+                        }
+                    },
+                    Action::Page(*page),
+                    *page == self.catalog.page,
+                );
+            }
+        }
+        let compact = w < 700.0;
+        let content_x = if w >= 700.0 { 244.0 } else { 32.0 };
+        let content_w = (w - content_x - 32.0).max(220.0);"""
+)
+# Draw the play page as a new launcher home, not the old instructional text list.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """            let top = 160.0;
+            ui.text(
+                Face::Medium,
+                32.0,
+                32.0,
+                top,
+                color::TEXT,
+                if installing {
+                    "Getting your game ready"
+                } else if installed {
+                    "Ready to play"
+                } else {
+                    if compact {
+                        "Your Java worlds"
+                    } else {
+                        "Your Java worlds, on Android"
+                    }
+                },
+            );""",
+    """            let top = 168.0;
+            let left = content_x;
+            ui.text(Face::Medium, 13.0, left, 158.0, color::MUTED,
+                if pt { "CENTRAL DE JOGO  /  JAVA EDITION" } else { "GAME HUB  /  JAVA EDITION" });
+            ui.text(
+                Face::Medium,
+                if compact { 28.0 } else { 38.0 },
+                left,
+                top,
+                color::TEXT,
+                if installing {
+                    if pt { "Preparando seu Minecraft" } else { "Getting your game ready" }
+                } else if installed {
+                    if pt { "Tudo pronto para jogar" } else { "Ready to play" }
+                } else if pt {
+                    "Seu Minecraft. Do seu jeito."
+                } else {
+                    "Your Minecraft. Your way."
+                },
+            );"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                32.0,
+                top + 47.0,
+                color::MUTED,
+                &format!("Minecraft 26.3  /  Profile {}", self.catalog.config.profile),""",
+    """                left,
+                top + 52.0,
+                color::MUTED,
+                &format!("Minecraft 26.3  /  {}", if pt { format!("Perfil {}", self.catalog.config.profile) } else { format!("Profile {}", self.catalog.config.profile) }),"""
+)
+# Position home copy and primary CTA in the content column.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                        32.0,
+                        top + 100.0 + index as f32 * 42.0,""",
+    """                        left,
+                        top + 112.0 + index as f32 * 42.0,"""
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """                    [32.0, h - 100.0, (w - 64.0).clamp(220.0, 420.0), 60.0],""",
+    """                    [left, h - 100.0, content_w.min(420.0), 60.0],"""
+)
+print("Replaced legacy wide-screen tabs with launcher sidebar and rebuilt the home page.");
