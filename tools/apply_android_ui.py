@@ -124,3 +124,41 @@ replace(
                 },"""
 )
 print("Android launcher language integration applied.")
+
+
+# Real visual redesign: branded header, layered launcher surfaces and responsive Play CTA.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    '            &format!("Horizon Android {}", crate::backend::VERSION),',
+    '            &format!("MINECRAFT RUST  •  {}", crate::backend::VERSION),'
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    '        if page == Page::Play {\n            use horizon_client::official_install::InstallStage;',
+    '''        if page == Page::Play {
+            // A distinct feature surface gives the home screen a launcher-style hero panel.
+            ui.rounded(20.0, 142.0, (w - 40.0).max(1.0), (h - 162.0).max(1.0), 16.0, color::RAISED);
+            ui.rounded(20.0, 142.0, 5.0, (h - 162.0).max(1.0), 2.0, color::ACCENT);
+            use horizon_client::official_install::InstallStage;'''
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    '''                    [32.0, h - 100.0, 320.0, 60.0],''',
+    '''                    [32.0, h - 100.0, (w - 64.0).clamp(220.0, 420.0), 60.0],'''
+)
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    '''            ui.text(
+                Face::Medium,
+                32.0,
+                32.0,
+                top,
+                color::TEXT,''',
+    '''            ui.text(
+                Face::Medium,
+                if compact { 28.0 } else { 36.0 },
+                32.0,
+                top,
+                color::TEXT,''',
+)
+print("Minecraft Rust launcher visual surfaces applied.")
