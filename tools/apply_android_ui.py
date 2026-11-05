@@ -486,13 +486,6 @@ replace(
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
-    """                        w - 150.0,
-                        y + 12.0,""",
-    """                        cx + cw - 118.0,
-                        y + 12.0,"""
-)
-replace(
-    "crates/horizon-client/src/android/launcher_pages.rs",
     """                        [w - 150.0, y, 118.0, 42.0],""",
     """                        [cx + cw - 118.0, y, 118.0, 42.0],"""
 )
