@@ -514,8 +514,8 @@ replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
     """                            if compact { 32.0 } else { w - 300.0 },""",
     """                            if compact { 32.0 } else { cx + cw - 268.0 },"""
-)
-replace(
+    count=3
+)replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
     """                            120.0,
                             row_height - 4.0,""",
@@ -543,11 +543,6 @@ replace(
                         y + 28.0,""",
     """                        cx,
                         y + 28.0,"""
-)
-replace(
-    "crates/horizon-client/src/android/launcher_pages.rs",
-    """                                if compact { 32.0 } else { w - 300.0 },""",
-    """                                if compact { 32.0 } else { cx + cw - 268.0 },"""
 )
 replace(
     "crates/horizon-client/src/android/launcher_pages.rs",
