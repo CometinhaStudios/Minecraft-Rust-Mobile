@@ -337,7 +337,7 @@ replace(
 replace(
     "crates/horizon-client/src/android/launcher.rs",
     "self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll);",
-    "self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll, if ui.w >= 700.0 { 244.0 } else { 0.0 });"
+    "let content_left = if ui.w >= 700.0 { 244.0 } else { 0.0 };\n            self.wardrobe\n                .draw(&mut ui, &mut self.targets, self.catalog.scroll, content_left);"
 )
 replace(
     "crates/horizon-client/src/android/wardrobe.rs",
