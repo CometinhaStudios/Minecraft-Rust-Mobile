@@ -318,3 +318,15 @@ replace(
     """                    [left, h - 100.0, content_w.min(420.0), 60.0],"""
 )
 print("Replaced legacy wide-screen tabs with launcher sidebar and rebuilt the home page.");
+
+
+# Keep the home card inside the content column; do not paint over the sidebar.
+replace(
+    "crates/horizon-client/src/android/launcher_pages.rs",
+    """            // A distinct feature surface gives the home screen a launcher-style hero panel.
+            ui.rounded(20.0, 142.0, (w - 40.0).max(1.0), (h - 162.0).max(1.0), 16.0, color::RAISED);
+            ui.rounded(20.0, 142.0, 5.0, (h - 162.0).max(1.0), 2.0, color::ACCENT);""",
+    """            // Main home surface sits beside the sidebar.
+            ui.rounded(content_x - 12.0, 142.0, content_w + 24.0, h - 162.0, 16.0, color::RAISED);
+            ui.rounded(content_x - 12.0, 142.0, 5.0, h - 162.0, 2.0, color::ACCENT);"""
+)
