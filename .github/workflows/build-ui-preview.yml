@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+env:
+  ANDROID_HOME: /usr/local/lib/android/sdk
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
 jobs:
   build-preview:
     runs-on: ubuntu-24.04
@@ -24,7 +28,9 @@ jobs:
           gradle-version: '8.11.1'
       - name: Install Android SDK
         run: |
-          sdkmanager --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0'
+          sdkmanager="$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager"
+          if [[ ! -x "$sdkmanager" ]]; then sdkmanager=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1); fi
+          "$sdkmanager" --sdk_root="$ANDROID_HOME" 'platforms;android-35' 'build-tools;35.0.0'
       - name: Build preview APK
         working-directory: demo-apk
         run: gradle --no-daemon assembleDebug
