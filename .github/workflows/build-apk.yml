@@ -2,7 +2,7 @@ name: Build Minecraft Rust APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'alpha/**', 'test/**', 'beta/**']
     paths:
       - '.github/workflows/build-apk.yml'
       - 'README.md'
@@ -136,26 +136,36 @@ jobs:
             --sdk "$ANDROID_HOME" --java-home "$JAVA_HOME" --gradle "$(command -v gradle)" \
             --ndk-version 28.2.13676358 --build-tools-version 35.0.0
 
+      - name: Set explicit build channel
+        run: |
+          case "$GITHUB_REF_NAME" in
+            alpha/01*|alpha-01*) echo "BUILD_CHANNEL=ALPHA-01" >> "$GITHUB_ENV" ;;
+            alpha/02*|alpha-02*) echo "BUILD_CHANNEL=ALPHA-02" >> "$GITHUB_ENV" ;;
+            test/01*|test-01*) echo "BUILD_CHANNEL=TESTE-01" >> "$GITHUB_ENV" ;;
+            test/02*|test-02*) echo "BUILD_CHANNEL=TESTE-02" >> "$GITHUB_ENV" ;;
+            beta/01*|beta-01*) echo "BUILD_CHANNEL=BETA-01" >> "$GITHUB_ENV" ;;
+            *) echo "BUILD_CHANNEL=DEV" >> "$GITHUB_ENV" ;;
+          esac
+
       - name: Rename and verify APK
         working-directory: upstream
         run: |
           mkdir -p dist
-          cp .local/android/apk/arm64-v8a/horizon-android-public.apk dist/Minecraft-Rust-arm64-v8a.apk
-          sha256sum dist/Minecraft-Rust-arm64-v8a.apk > dist/SHA256SUMS.txt
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/Minecraft-Rust-arm64-v8a.apk | head -n 1
-          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
-          ## Minecraft Rust APK
-          ARM64 build generated from the upstream Horizon Android engine, with Minecraft Rust app branding and Android user-controlled orientation.
-          
-          Android launcher source patch applied: persisted language preference with Automatic (Android system locale) and Português (Brasil), plus translated navigation labels and settings heading. FPS-unlimited frame pacing and Turnip ZIP driver management are not included in this build.
+          cp .local/android/apk/arm64-v8a/horizon-android-public.apk "dist/Minecraft-Rust-${BUILD_CHANNEL}-arm64-v8a.apk"
+          sha256sum "dist/Minecraft-Rust-${BUILD_CHANNEL}-arm64-v8a.apk" > dist/SHA256SUMS.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "dist/Minecraft-Rust-${BUILD_CHANNEL}-arm64-v8a.apk" | head -n 1
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Minecraft Rust — ${BUILD_CHANNEL}
+          ARM64 build channel: ${BUILD_CHANNEL}. Source commit: ${GITHUB_SHA}.
+          The artifact is a test build; compilation does not imply that physical-device UI tests passed.
           EOF
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Minecraft-Rust-arm64
+          name: Minecraft-Rust-${{ env.BUILD_CHANNEL }}-arm64
           path: |
-            upstream/dist/Minecraft-Rust-arm64-v8a.apk
+            upstream/dist/Minecraft-Rust-${{ env.BUILD_CHANNEL }}-arm64-v8a.apk
             upstream/dist/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 14
