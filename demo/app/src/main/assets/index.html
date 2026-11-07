@@ -4,7 +4,7 @@
 :root{--bg:#111416;--panel:#1c2123;--line:#343c3e;--green:#39d653;--text:#f2f4f2;--muted:#aeb7b6}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial, sans-serif;height:100vh;overflow:hidden}
 header{height:64px;background:#121516;border-bottom:1px solid #303738;display:flex;align-items:center;padding:0 22px;gap:14px}
-.logo{width:48px;height:48px;border-radius:7px;background:linear-gradient(135deg,#54ef5d,#087e25);display:grid;place-items:center;font-size:28px;color:#07190a;font-weight:bold;box-shadow:inset 0 0 0 3px #80ff78}
+.logo{width:48px;height:48px;flex:0 0 48px;border-radius:7px;background:linear-gradient(135deg,#54ef5d,#087e25);display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 0 0 3px #80ff78}.logo canvas{width:100%;height:100%;image-rendering:pixelated;display:block}.logo .avatar-placeholder{font-size:25px;color:#07190a;font-weight:bold}
 .brand{font-size:26px;font-weight:900;letter-spacing:-1px}.brand b{color:#ed3434}.sub{font-size:12px;color:#9ca5a5;margin-top:2px}
 .layout{height:calc(100dvh - 64px);display:grid;grid-template-columns:174px minmax(0,1fr);min-height:0}
 aside{background:#171b1d;border-right:1px solid #303738;padding:14px 9px;display:flex;flex-direction:column;gap:7px}
@@ -23,13 +23,13 @@ main{padding:10px 12px;min-width:0;min-height:0;overflow:hidden}
 .news{border:1px solid #3b4344;border-radius:8px;background:linear-gradient(145deg,#22282a,#171b1d);padding:12px;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
 .nhead{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:bold;font-size:clamp(13px,1.5vw,18px);min-width:0}.date{font-size:12px;color:#9ea7a7;font-weight:normal}
 .news h2{font-size:clamp(14px,1.6vw,19px);margin:10px 0 6px}.news p{color:#c5ccca;line-height:1.3;margin:0;font-size:clamp(11px,1.2vw,14px)}.news ul{border-top:1px solid #41494a;padding:8px 0 0 17px;margin:8px 0 0;color:#cbd1d0;line-height:1.4;font-size:clamp(10px,1.1vw,13px)}.news li::marker{color:var(--green)}.more{color:#4fe568;text-align:right;margin-top:auto;text-decoration:underline}
-.playrow{display:flex;justify-content:center;padding:3px;flex-shrink:0}.play{width:min(70%,620px);height:48px;border:2px solid #07190a;border-radius:8px;background:linear-gradient(#39e557,#148d2d);color:white;font-size:27px;font-weight:900;text-shadow:1px 2px #175326;box-shadow:inset 0 3px #7aff85,0 4px #07140a}
+.playrow{display:flex;justify-content:center;padding:3px;flex-shrink:0}.play{width:min(70%,620px);height:52px;border:2px solid #102b15;border-radius:9px;background:linear-gradient(180deg,#65f477 0%,#2bc94b 45%,#16852e 100%);color:#fff;font-size:27px;font-weight:900;letter-spacing:.5px;text-shadow:1px 2px #175326;box-shadow:inset 0 3px 0 #a1ffab,inset 0 -4px 0 #126b25,0 5px 0 #07140a,0 8px 15px #0008;transition:transform .12s,filter .12s;cursor:pointer}.play:active{transform:translateY(4px);filter:brightness(.92);box-shadow:inset 0 2px 0 #a1ffab,0 1px 0 #07140a,0 3px 8px #0008}.play:focus-visible,.pick:focus-visible{outline:2px solid #9affaa;outline-offset:3px}
 h1{font-size:25px;margin:4px 0 7px}.desc{color:var(--muted);margin:0 0 18px;font-size:14px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}.card{background:#22292b;border:1px solid #3b4546;border-radius:8px;overflow:hidden}.thumb{height:110px;display:grid;place-items:center;font-size:44px;background:linear-gradient(135deg,#547d3c,#203c2c 60%,#9c764d)}.card h3{margin:11px 13px 5px;font-size:16px}.card p{margin:0 13px 12px;color:#adb8b6;font-size:12px}.pick{margin:0 13px 13px;background:#236d36;color:white;border:1px solid #39bd50;border-radius:5px;padding:7px 12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px}.card{background:#22292b;border:1px solid #3b4546;border-radius:8px;overflow:hidden}.thumb{height:110px;display:grid;place-items:center;font-size:44px;background:linear-gradient(135deg,#547d3c,#203c2c 60%,#9c764d)}.card h3{margin:11px 13px 5px;font-size:16px}.card p{margin:0 13px 12px;color:#adb8b6;font-size:12px}.pick{margin:0 13px 13px;background:#236d36;color:white;border:1px solid #39bd50;border-radius:5px;padding:7px 12px;cursor:pointer}.pick.selected{background:#183d25;border-color:#7df58d;color:#a7ffb2}.page-status{margin:14px 0;padding:10px 12px;border:1px solid #3c7549;border-radius:6px;background:#17291d;color:#bdf5c5;font-size:13px;min-height:36px}.skin-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px;padding:12px;background:#202729;border:1px solid #3b4546;border-radius:8px}.skin-tools label{background:#236d36;border:1px solid #39bd50;border-radius:5px;padding:9px 13px;cursor:pointer;color:white;font-weight:bold}.skin-tools input{display:none}.skin-tools small{color:#aeb7b6}
 .setting{display:flex;justify-content:space-between;border-bottom:1px solid #343c3e;padding:15px 0;font-size:14px}.setting span:last-child{color:#9fe9a8}
 @media(max-width:760px){.layout{grid-template-columns:68px minmax(0,1fr)}aside{padding:7px 4px;gap:4px}nav button{height:49px;justify-content:center;padding:0}.navlabel{display:none}.ico{font-size:19px}main{padding:7px}.hero{grid-template-columns:minmax(0,1.35fr) minmax(155px,1fr);gap:6px}.news{padding:8px}.news h2{margin:7px 0 5px}.news ul{line-height:1.25;padding-top:5px;margin-top:6px}.more{font-size:10px}.play{width:80%;height:42px;font-size:20px}.brand{font-size:20px}}@media(max-height:480px){header{height:54px}.layout{height:calc(100dvh - 54px)}.play{height:36px}.news h2{margin:5px 0}.news ul{line-height:1.15}.tag{bottom:10%}.mark{top:32%}}
 </style></head><body>
-<header><div class="logo">☠</div><div><div class="brand">Minecraft <b>Rust</b></div><div class="sub">Launcher v0.1.0 (Alpha) · Teste 1</div></div></header>
+<header><div class="logo" id="profileAvatar" title="Skin selecionada"><span class="avatar-placeholder">?</span></div><div><div class="brand">Minecraft <b>Rust</b></div><div class="sub">Launcher v0.1.0 (Alpha) · Teste 1</div></div></header>
 <div class="layout"><aside><nav>
 <button class="active" data-page="home"><span class="ico">🟩</span><span class="navlabel">Início</span></button>
 <button data-page="mods"><span class="ico">🧩</span><span class="navlabel">Mods</span></button>
@@ -39,12 +39,58 @@ h1{font-size:25px;margin:4px 0 7px}.desc{color:var(--muted);margin:0 0 18px;font
 <button data-page="settings"><span class="ico">⚙️</span><span class="navlabel">Configurações</span></button>
 </nav></aside><main>
 <section id="home" class="page active home"><div class="hero"><div class="banner"><div class="mark"><img src="minecraft-logo.svg" alt="Minecraft"><span>RUST</span></div><div class="tag">Jogue, explore, sobreviva!</div></div><article class="news"><div class="nhead"><span>Novidades e melhorias</span><span class="date">ALPHA</span></div><h2>O que há de novo no Minecraft Rust</h2><p>Acompanhe a evolução do launcher e os recursos que estão chegando.</p><ul><li>Interface redesenhada para celular</li><li>Gerenciamento de mods e shaders</li><li>Pacotes de texturas e skins</li><li>Correções de layout e sobreposição</li><li>Melhorias de estabilidade e navegação</li><li>Novidades do projeto em um só lugar</li></ul><div class="more">Registro de novidades →</div></article></div><div class="playrow"><button class="play" onclick="AndroidDemo.play()">▶ &nbsp; Jogar</button></div></section>
-<section id="mods" class="page"><h1>🧩 Mods</h1><p class="desc">Explore e organize seus mods.</p><div class="cards"><article class="card"><div class="thumb">🧭</div><h3>JourneyMap</h3><p>Mapa e pontos de exploração.</p><button class="pick">Ver detalhes</button></article><article class="card"><div class="thumb">🌾</div><h3>Farmer's Delight</h3><p>Novos alimentos e agricultura.</p><button class="pick">Ver detalhes</button></article><article class="card"><div class="thumb">🪑</div><h3>Decoração</h3><p>Itens decorativos.</p><button class="pick">Ver detalhes</button></article></div></section>
-<section id="shaders" class="page"><h1>☀️ Shaders</h1><p class="desc">Pré-visualize estilos gráficos para o seu mundo.</p><div class="cards"><article class="card"><div class="thumb">🌅</div><h3>Sunset Shader</h3><p>Luz quente e pôr do sol.</p><button class="pick">Selecionar</button></article><article class="card"><div class="thumb">💧</div><h3>Clear Water</h3><p>Água cristalina e reflexos suaves.</p><button class="pick">Selecionar</button></article></div></section>
-<section id="textures" class="page"><h1>🟫 Texturas</h1><p class="desc">Escolha pacotes visuais para o jogo.</p><div class="cards"><article class="card"><div class="thumb">🌿</div><h3>Nature Pack</h3><p>Visual natural com detalhes suaves.</p><button class="pick">Selecionar</button></article><article class="card"><div class="thumb">🧱</div><h3>Classic HD</h3><p>Estilo clássico com mais definição.</p><button class="pick">Selecionar</button></article></div></section>
-<section id="skins" class="page"><h1>👤 Skins</h1><p class="desc">Pré-visualização de personagens.</p><div class="cards"><article class="card"><div class="thumb">🧑‍🌾</div><h3>Aventureiro</h3><p>Visual clássico de exploração.</p><button class="pick">Selecionar</button></article><article class="card"><div class="thumb">🧙</div><h3>Mago</h3><p>Um estilo fantástico.</p><button class="pick">Selecionar</button></article></div></section>
+<section id="mods" class="page"><h1>🧩 Mods</h1><p class="desc">Explore e organize seus mods.</p><div class="page-status" id="modsStatus" aria-live="polite">Nenhum mod selecionado.</div><div class="cards"><article class="card"><div class="thumb">🧭</div><h3>JourneyMap</h3><p>Mapa e pontos de exploração.</p><button class="pick">Ver detalhes</button></article><article class="card"><div class="thumb">🌾</div><h3>Farmer's Delight</h3><p>Novos alimentos e agricultura.</p><button class="pick">Ver detalhes</button></article><article class="card"><div class="thumb">🪑</div><h3>Decoração</h3><p>Itens decorativos.</p><button class="pick">Ver detalhes</button></article></div></section>
+<section id="shaders" class="page"><h1>☀️ Shaders</h1><p class="desc">Pré-visualize estilos gráficos para o seu mundo.</p><div class="page-status" id="shadersStatus" aria-live="polite">Nenhum shader selecionado.</div><div class="cards"><article class="card"><div class="thumb">🌅</div><h3>Sunset Shader</h3><p>Luz quente e pôr do sol.</p><button class="pick">Selecionar</button></article><article class="card"><div class="thumb">💧</div><h3>Clear Water</h3><p>Água cristalina e reflexos suaves.</p><button class="pick">Selecionar</button></article></div></section>
+<section id="textures" class="page"><h1>🟫 Texturas</h1><p class="desc">Escolha pacotes visuais para o jogo.</p><div class="page-status" id="texturesStatus" aria-live="polite">Nenhum pacote selecionado.</div><div class="cards"><article class="card"><div class="thumb">🌿</div><h3>Nature Pack</h3><p>Visual natural com detalhes suaves.</p><button class="pick">Selecionar</button></article><article class="card"><div class="thumb">🧱</div><h3>Classic HD</h3><p>Estilo clássico com mais definição.</p><button class="pick">Selecionar</button></article></div></section>
+<section id="skins" class="page"><h1>👤 Skins</h1><p class="desc">Escolha uma skin ou importe seu arquivo PNG. O rosto frontal aparece no canto superior.</p><div class="skin-tools"><label for="skinUpload">＋ Importar skin PNG</label><input id="skinUpload" type="file" accept="image/png"><small id="skinStatus">Nenhuma skin personalizada carregada.</small></div><div class="cards"><article class="card"><div class="thumb">🧑‍🌾</div><h3>Aventureiro</h3><p>Visual clássico de exploração.</p><button class="pick">Selecionar</button></article><article class="card"><div class="thumb">🧙</div><h3>Mago</h3><p>Um estilo fantástico.</p><button class="pick">Selecionar</button></article></div></section>
 <section id="settings" class="page"><h1>⚙️ Configurações</h1><p class="desc">Preferências visuais desta demonstração.</p><div class="setting"><span>Idioma</span><span>Português (Brasil)</span></div><div class="setting"><span>Tema</span><span>Escuro · Minecraft</span></div><div class="setting"><span>Versão do launcher</span><span>Alpha 0.1 · Teste 1</span></div><div class="setting"><span>Modo</span><span>Demonstração visual</span></div></section>
 </main></div>
 <script>
-document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(b.dataset.page).classList.add('active')}));
+const navButtons=[...document.querySelectorAll('nav button')];
+const pages=[...document.querySelectorAll('.page')];
+navButtons.forEach(button=>button.addEventListener('click',()=>{
+  navButtons.forEach(item=>item.classList.toggle('active',item===button));
+  pages.forEach(page=>page.classList.toggle('active',page.id===button.dataset.page));
+}));
+const selections={mods:null,shaders:null,textures:null};
+const statusIds={mods:'modsStatus',shaders:'shadersStatus',textures:'texturesStatus'};
+document.querySelectorAll('#mods .pick,#shaders .pick,#textures .pick').forEach(button=>{
+  button.addEventListener('click',()=>{
+    const page=button.closest('.page').id;
+    const name=button.closest('.card').querySelector('h3').textContent;
+    selections[page]=name;
+    button.closest('.cards').querySelectorAll('.pick').forEach(item=>{
+      item.classList.toggle('selected',item===button);
+      item.textContent=item===button?'✓ Selecionado':'Selecionar';
+    });
+    document.getElementById(statusIds[page]).textContent='Selecionado: '+name+'. Essa escolha fica separada das outras categorias.';
+  });
+});
+const avatar=document.getElementById('profileAvatar');
+function showFace(source){
+  const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;
+  const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(source,8,8,8,8,0,0,64,64);
+  ctx.drawImage(source,40,8,8,8,0,0,64,64);
+  avatar.replaceChildren(canvas);
+}
+document.getElementById('skinUpload').addEventListener('change',event=>{
+  const file=event.target.files&&event.target.files[0];if(!file)return;
+  if(file.type!=='image/png'){document.getElementById('skinStatus').textContent='Escolha um arquivo PNG.';return;}
+  const image=new Image();
+  image.onload=()=>{
+    if(image.width<64||image.height<32){document.getElementById('skinStatus').textContent='A imagem precisa ser uma skin Minecraft 64×64 (ou 64×32).';return;}
+    showFace(image);
+    document.getElementById('skinStatus').textContent='Skin carregada: '+file.name;
+  };
+  image.onerror=()=>document.getElementById('skinStatus').textContent='Não foi possível abrir essa imagem.';
+  image.src=URL.createObjectURL(file);
+});
+document.querySelectorAll('#skins .pick').forEach(button=>button.addEventListener('click',()=>{
+  const name=button.closest('.card').querySelector('h3').textContent;
+  document.querySelectorAll('#skins .pick').forEach(item=>{item.classList.toggle('selected',item===button);item.textContent=item===button?'✓ Selecionada':'Selecionar';});
+  document.getElementById('skinStatus').textContent='Skin de demonstração selecionada: '+name+'. Importe um PNG para mostrar o rosto real.';
+  const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;const ctx=canvas.getContext('2d');
+  ctx.fillStyle=name==='Mago'?'#6b4ba0':'#3f8650';ctx.fillRect(0,0,64,64);ctx.fillStyle='#d9a47c';ctx.fillRect(16,10,32,38);ctx.fillStyle='#29211d';ctx.fillRect(16,8,32,10);ctx.fillStyle='#222';ctx.fillRect(22,26,5,5);ctx.fillRect(37,26,5,5);ctx.fillStyle='#7d302b';ctx.fillRect(27,39,11,3);avatar.replaceChildren(canvas);
+}));
 </script></body></html>
