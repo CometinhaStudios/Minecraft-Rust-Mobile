@@ -40,7 +40,9 @@ jobs:
 
       - name: Apply Minecraft Rust Android UI and language integration
         working-directory: upstream
-        run: python3 ../tools/apply_android_ui.py
+        run: |
+          python3 -m py_compile ../tools/apply_android_ui.py
+          python3 ../tools/apply_android_ui.py
 
       - name: Apply Minecraft Rust Android branding and rotation
         working-directory: upstream
@@ -147,7 +149,7 @@ jobs:
           ## Minecraft Rust APK
           ARM64 build generated from the upstream Horizon Android engine, with Minecraft Rust app branding and Android user-controlled orientation.
           
-          Android launcher source patch applied: persisted language preference with Automatic (Android system locale) and Português (Brasil), plus translated navigation labels and settings heading. FPS-unlimited frame pacing and Turnip ZIP driver management are not included in this build.
+          Native launcher branding updated to Minecraft Rust while retaining the real Horizon engine, sidebar navigation, account flow, settings, content management, and Play/install actions.
           EOF
 
       - name: Upload APK
