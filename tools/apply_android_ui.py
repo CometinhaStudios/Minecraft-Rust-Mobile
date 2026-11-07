@@ -121,4 +121,14 @@ replacement = """        <activity android:name="dev.horizon.android.MinecraftRu
 source = source.replace(alias, replacement)
 manifest.write_text(source, encoding="utf-8")
 
+# android_build.py creates a clean Gradle assets staging directory later in the
+# workflow. Teach it to carry the custom WebView launcher assets into that APK.
+build_script = ROOT / "tools/android_build.py"
+build_source = build_script.read_text(encoding="utf-8")
+needle = "    assets.mkdir(parents=True, exist_ok=True)\n"
+insertion = needle + "    custom_assets = ROOT / 'packaging/android/assets'\n    if custom_assets.is_dir():\n        shutil.copytree(custom_assets, assets, dirs_exist_ok=True)\n"
+if build_source.count(needle) != 1:
+    raise SystemExit("Could not locate the Android Gradle assets staging point")
+build_script.write_text(build_source.replace(needle, insertion), encoding="utf-8")
+
 print("Minecraft Rust WebView launcher installed; Play opens the real Horizon NativeActivity.")
