@@ -5,32 +5,32 @@ Android launcher fork/customization based on [Vasysik/horizon-android](https://g
 **Android application label:** Minecraft Rust  
 **Repository:** Minecraft Rust Mobile
 
-## Project direction
+## Current build target
 
-Minecraft Rust keeps the Horizon Rust game engine and develops a launcher UI inspired by the visual language of the official Minecraft Launcher, redesigned for Android.
+The next ARM64 package is built from the real Horizon Android Rust engine, not the visual-only WebView demo. The build applies the Minecraft Rust native launcher customization before compiling and packages the engine into the APK.
+
+### Launcher direction
+
+- Minecraft Rust name and branding.
+- Redesigned launcher home screen with a persistent navigation rail on wide layouts and a compact layout on phones.
+- Portuguese, Spanish and English interface labels.
+- Separate Play, Mods, Textures, Shaders, Installed content, Settings and Appearance sections.
+- The Play action remains connected to Horizon's actual resource installation and game launch flow.
 
 ### Responsive launcher
 
-- **Landscape:** desktop-launcher composition: left navigation rail, large Play feature area, compact profile/version selector and green Play action.
-- **Portrait:** same visual hierarchy adapted to a vertical layout: compact top bar, vertically stacked navigation cards, prominent Play action and scrollable content. No forced rotation; follow the user's Android orientation choice.
-- **Navigation:** Textures, Mods, Shaders, Settings. Each category receives a custom original monochrome/pixel-friendly symbol; Settings uses a gear.
-- **Settings:** dark panels, green selection accents, consistent rows, toggles, dropdowns and sliders.
+- **Landscape:** desktop-launcher composition with left navigation rail, large Play feature area and primary Play action.
+- **Portrait:** compact layout adapted to the phone screen, following the Android orientation choice.
+- **Navigation:** Textures, Mods, Shaders, Installed, Settings and Appearance.
+- **Settings:** dark panels, green selection accents and persisted language selection.
 
-### Planned engineering work
+## Engine and compatibility
 
-1. Responsive launcher layout and original icon set.
-2. Separate Textures, Mods and Shaders pages with import/install/enable/remove flows supported by the engine.
-3. FPS option **Unlimited**, after tracing the engine frame limiter and ensuring the setting reaches the actual render loop.
-4. Driver management research. Turnip ZIP import must validate package contents, ABI, Vulkan driver integration and device compatibility; merely extracting a ZIP is not driver support.
-5. Build and test signed/unsigned APKs for arm64 Android, then publish artifacts through GitHub Actions.
+Minecraft Rust keeps the Horizon Rust/wgpu engine and its Android lifecycle. The app downloads and verifies the required Minecraft Java 26.3 resources on-device through the engine's existing installer. The build does not bundle Minecraft game files or accounts.
 
-## Important compatibility notes
+The upstream Android client is native Rust/wgpu; its launcher is not a standard WebView page. The production APK therefore applies the redesigned interface in the native launcher source while preserving the real engine.
 
-The upstream Android client is a native Rust/wgpu application. Its launcher is not a separate web page or a standard Kotlin activity. UI changes must be made in the Rust Android launcher code and preserve the engine lifecycle.
-
-Turnip integration is not enabled by selecting a ZIP file. Android Vulkan driver loading has platform, ABI, linker and vendor constraints. Unsupported packages must be rejected safely and the system driver must remain available as fallback.
-
-An Unlimited FPS option removes the app's configured cap only. It cannot guarantee a particular frame rate; display refresh rate, GPU/CPU load, thermal limits, synchronization and game workload still apply.
+Turnip ZIP import and Unlimited FPS are not included in this build. Android Vulkan driver loading has platform, ABI, linker and vendor constraints. An uncapped frame limiter also cannot guarantee a particular FPS because display refresh rate, workload and thermal limits still apply.
 
 ## Upstream
 
@@ -38,4 +38,4 @@ An Unlimited FPS option removes the app's configured cap only. It cannot guarant
 - Upstream Android branch: `android`
 - Upstream documentation: `docs/android.md`
 
-This repository is the project home. Source synchronization and implementation commits will be added as the fork is brought in and changes are tested.
+This project preserves upstream attribution and third-party notices. Minecraft Rust is unofficial and is not affiliated with or endorsed by Mojang or Microsoft.
