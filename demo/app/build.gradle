@@ -1,0 +1,13 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.cometinha.minecraftrustdemo'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.cometinha.minecraftrustdemo'
+        minSdk 23
+        targetSdk 28
+        versionCode 1
+        versionName 'Alpha 0.1 - Teste 1'
+    }
+}
