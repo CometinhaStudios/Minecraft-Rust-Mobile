@@ -1,55 +1,124 @@
 from pathlib import Path
+import re
+import shutil
 
-def replace_once(path: str, old: str, new: str) -> None:
-    file = Path(path)
-    source = file.read_text(encoding="utf-8")
-    matches = source.count(old)
-    if matches != 1:
-        raise SystemExit(
-            f"{path}: expected exactly one current-source match, found {matches}: {old!r}"
-        )
-    file.write_text(source.replace(old, new), encoding="utf-8")
+ROOT = Path.cwd()
+PROJECT = ROOT.parent
+ANDROID = ROOT / "packaging/android"
 
+def replace_once(path: Path, old: str, new: str) -> None:
+    source = path.read_text(encoding="utf-8")
+    count = source.count(old)
+    if count != 1:
+        raise SystemExit(f"{path}: expected exactly one match, found {count}: {old!r}")
+    path.write_text(source.replace(old, new), encoding="utf-8")
 
-# The upstream Android launcher has evolved into a native, animated sidebar UI.
-# Keep its real navigation, settings, account, downloads, and Play/install actions;
-# only replace the upstream identity/copy with Minecraft Rust branding.
-launcher = "crates/horizon-client/src/android/launcher_pages.rs"
+# Keep the real Horizon Rust/Vulkan engine. Replace only its Android entry screen
+# with the Minecraft Rust WebView launcher, following the Wudroid architecture.
+assets = ANDROID / "assets/minecraft-rust"
+assets.mkdir(parents=True, exist_ok=True)
+shutil.copy2(PROJECT / "demo/app/src/main/assets/index.html", assets / "index.html")
+shutil.copy2(PROJECT / "demo/app/src/main/assets/minecraft-logo.svg", assets / "minecraft-logo.svg")
+if (PROJECT / "assets/icons").exists():
+    shutil.copytree(PROJECT / "assets/icons", assets / "icons", dirs_exist_ok=True)
 
-replace_once(
-    launcher,
-    'ui.text(Face::SemiBold, 16.0, 54.0, 10.0, my3_text(), "Horizon");',
-    'ui.text(Face::SemiBold, 16.0, 54.0, 10.0, my3_text(), "Minecraft Rust");',
-)
+html = (assets / "index.html").read_text(encoding="utf-8")
+html = html.replace("AndroidDemo.play()", "RustBridge.play()")
+html = html.replace("Launcher Alpha 0.5 · Banner", "Minecraft Rust · Launcher")
+html = html.replace("Preferências visuais desta demonstração.", "Preferências do Minecraft Rust.")
+html = html.replace("Modo</span><span>Demonstração visual", "Motor</span><span>Horizon Rust + Vulkan")
+(assets / "index.html").write_text(html, encoding="utf-8")
 
-replace_once(
-    launcher,
-    'let version_line = format!("Android {}", crate::backend::VERSION);',
-    'let version_line = format!("Rust Engine  •  {}", crate::backend::VERSION);',
-)
+java_dir = ANDROID / "java/dev/horizon/android"
+java_dir.mkdir(parents=True, exist_ok=True)
+(java_dir / "MinecraftRustLauncherActivity.java").write_text("""package dev.horizon.android;
 
-replace_once(
-    launcher,
-    '"Your Java worlds, on Android"',
-    '"Minecraft Rust  •  Java Edition"',
-)
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
-replace_once(
-    launcher,
-    '"Your Java worlds"',
-    '"Minecraft Rust"',
-)
+public final class MinecraftRustLauncherActivity extends Activity {
+    private WebView webView;
 
-replace_once(
-    launcher,
-    '"Horizon Android is becoming Starling"',
-    '"Your Minecraft. Your world."',
-)
+    @Override protected void onCreate(Bundle state) {
+        super.onCreate(state);
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        webView = new WebView(this);
+        webView.setBackgroundColor(android.graphics.Color.rgb(17, 20, 22));
+        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
+        webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setAllowContentAccess(true);
+        webView.setWebViewClient(new WebViewClient());
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.addJavascriptInterface(new RustBridge(), "RustBridge");
+        setContentView(webView);
+        if (state == null) {
+            webView.loadUrl("file:///android_asset/minecraft-rust/index.html");
+        } else {
+            webView.restoreState(state);
+        }
+    }
 
-replace_once(
-    launcher,
-    '"Some Horizon Android features are still being transferred and merged. Export your worlds through Android Files (SAF) before moving."',
-    '"Minecraft Rust combines a redesigned launcher with the Horizon Rust and Vulkan game engine. Install the game, manage your content, and launch it from one place."',
-)
+    public final class RustBridge {
+        @JavascriptInterface public void play() {
+            runOnUiThread(() -> startActivity(
+                    new Intent(MinecraftRustLauncherActivity.this, HorizonActivity.class)));
+        }
+    }
 
-print("Minecraft Rust native launcher branding applied to the current Horizon Android source.")
+    @Override protected void onSaveInstanceState(Bundle out) {
+        if (webView != null) webView.saveState(out);
+        super.onSaveInstanceState(out);
+    }
+
+    @Override public void onBackPressed() {
+        if (webView != null && webView.canGoBack()) webView.goBack();
+        else super.onBackPressed();
+    }
+
+    @Override protected void onDestroy() {
+        if (webView != null) { webView.destroy(); webView = null; }
+        super.onDestroy();
+    }
+}
+""", encoding="utf-8")
+
+manifest = ANDROID / "AndroidManifest.xml"
+source = manifest.read_text(encoding="utf-8")
+source = source.replace('android:label="Horizon Android"', 'android:label="Minecraft Rust"')
+source = source.replace('android:screenOrientation="sensorLandscape"', 'android:screenOrientation="user"')
+alias = """        <activity-alias android:name="com.google.androidgamesdk.GameActivity" android:targetActivity="dev.horizon.android.HorizonActivity" android:exported="true">
+            <meta-data android:name="android.app.lib_name" android:value="horizon_android" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>"""
+if source.count(alias) != 1:
+    raise SystemExit("Expected exactly one upstream launcher alias to replace")
+replacement = """        <activity android:name="dev.horizon.android.MinecraftRustLauncherActivity" android:exported="true" android:screenOrientation="user" android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation|density|screenLayout" android:theme="@android:style/Theme.Material.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity-alias android:name="com.google.androidgamesdk.GameActivity" android:targetActivity="dev.horizon.android.HorizonActivity" android:exported="true">
+            <meta-data android:name="android.app.lib_name" android:value="horizon_android" />
+        </activity-alias>"""
+source = source.replace(alias, replacement)
+manifest.write_text(source, encoding="utf-8")
+
+print("Minecraft Rust WebView launcher installed; Play opens the real Horizon NativeActivity.")
