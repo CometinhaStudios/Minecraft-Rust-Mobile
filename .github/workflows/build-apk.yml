@@ -8,6 +8,7 @@ on:
       - 'README.md'
       - 'docs/**'
       - 'assets/**'
+      - 'demo/**'
       - 'tools/apply_android_ui.py'
   workflow_dispatch:
 
